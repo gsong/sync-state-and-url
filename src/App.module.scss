@@ -1,0 +1,20 @@
+.form {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.featureList {
+  max-width: 60ch;
+  font-size: 1rem;
+
+  li {
+    margin-top: 0.75rem;
+  }
+}
+
+.hits {
+  li {
+      margin-top: 0.75rem;
+  }
+}
