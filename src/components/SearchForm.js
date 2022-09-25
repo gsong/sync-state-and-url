@@ -1,6 +1,8 @@
+import { PARAMS } from "../constants.js";
+
 import styles from "../App.module.scss";
 
-const SearchForm = () => (
+const SearchForm = ({ searchParams, onSubmit }) => (
   <form
     method="get"
     {...{ onSubmit }}
