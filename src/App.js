@@ -11,7 +11,7 @@ import styles from "./App.module.scss";
 
 export default function App() {
   const { searchParams, onSubmit, replaceState, setReplaceState } = useInit();
-  const { status, hits, showResults } = useSearch({ searchParams });
+  const { status, hits, showResults } = useSearch(searchParams);
 
   return (
     <>
@@ -83,7 +83,7 @@ const useInit = () => {
   };
 };
 
-const useSearch = ({ searchParams: _searchParams }) => {
+const useSearch = (_searchParams) => {
   const [status, setStatus] = React.useState();
   const [hits, setHits] = React.useState([]);
 
@@ -131,7 +131,7 @@ const useSearch = ({ searchParams: _searchParams }) => {
           ).json();
           setResults(hits);
         } catch (error) {
-          console.error('Error: ', error);
+          console.error("Error: ", error);
         }
       })();
     } else {
