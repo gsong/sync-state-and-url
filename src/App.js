@@ -10,12 +10,7 @@ import { PARAMS } from "./constants.js";
 import styles from "./App.module.scss";
 
 export default function App() {
-  const {
-    searchParams,
-    onSubmit,
-    replaceState,
-    setReplaceState,
-  } = useInit();
+  const { searchParams, onSubmit, replaceState, setReplaceState } = useInit();
   const { status, hits, showResults } = useSearch({ searchParams });
 
   return (
@@ -130,17 +125,21 @@ const useSearch = ({ searchParams: _searchParams }) => {
       const url = `https://hn.algolia.com/api/v1/${searchPath}?${params}`;
 
       (async () => {
-        const { hits } = await (
-          await fetch(url, { signal: controller.signal })
-        ).json();
-        setResults(hits);
+        try {
+          const { hits } = await (
+            await fetch(url, { signal: controller.signal })
+          ).json();
+          setResults(hits);
+        } catch (error) {
+          console.error('Error: ', error);
+        }
       })();
     } else {
       setResults([]);
     }
 
     return () => controller.abort();
-  }, [_searchParams, setStatus, searchParams, showResults]);
+  }, [_searchParams, searchParams, showResults]);
 
   return { status, hits, showResults };
 };
