@@ -67,13 +67,16 @@ const useInit = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [replaceState, setReplaceState] = React.useState(false);
 
-  const onSubmit = (event) => {
-    const { currentTarget: form } = event;
-    event.preventDefault();
-    setSearchParams(Object.fromEntries(new FormData(form).entries()), {
-      replaceState,
-    });
-  };
+  const onSubmit = React.useCallback(
+    (event) => {
+      const { currentTarget: form } = event;
+      event.preventDefault();
+      setSearchParams(Object.fromEntries(new FormData(form).entries()), {
+        replaceState,
+      });
+    },
+    [replaceState, setSearchParams]
+  );
 
   return {
     searchParams,
@@ -97,10 +100,9 @@ const useSearch = (_searchParams) => {
     [_searchParams]
   );
 
-  const showResults = React.useMemo(
-    () => Object.keys(searchParams).length > 0,
-    [searchParams]
-  );
+  const showResults = Object.keys(searchParams).length > 0;
+  const searchPath =
+    _searchParams[PARAMS.sortByRecent] === "on" ? "search_by_date" : "search";
 
   React.useEffect(() => {
     const setResults = (hits) => {
@@ -113,10 +115,6 @@ const useSearch = (_searchParams) => {
     setStatus("searching");
 
     if (showResults) {
-      const searchPath =
-        _searchParams[PARAMS.sortByRecent] === "on"
-          ? "search_by_date"
-          : "search";
       const tags = searchParams[PARAMS.tags];
       const params = queryString.stringify(
         { ...searchParams, [PARAMS.tags]: tags ? [tags, "story"] : "story" },
@@ -139,7 +137,7 @@ const useSearch = (_searchParams) => {
     }
 
     return () => controller.abort();
-  }, [_searchParams, searchParams, showResults]);
+  }, [searchParams, showResults, searchPath]);
 
   return { status, hits, showResults };
 };
