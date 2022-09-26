@@ -4,6 +4,7 @@ import queryString from "query-string";
 
 const useSearchParams = (parseOptions, stringifyOptions) => {
   const [searchParams, _setSearchParams] = React.useState({});
+  const locationSearchRef = React.useRef(window.location.search);
 
   const setSearchParams = React.useCallback(
     (params, { replaceState } = { replaceState: false }) => {
@@ -18,12 +19,24 @@ const useSearchParams = (parseOptions, stringifyOptions) => {
 
       _setSearchParams(params);
     },
-    [_setSearchParams, stringifyOptions]
+    [stringifyOptions]
   );
+
+  // Allows for proper navigation of history
+  // https://www.codeguage.com/courses/js/events-popstate-event
+  const subscribe = (_callback) => {
+    const callback = (event) => {
+      locationSearchRef.current = window.location.search;
+      _callback(event);
+    };
+
+    window.addEventListener("popstate", callback);
+    return () => window.removeEventListener("popstate", callback);
+  };
 
   const locationSearch = React.useSyncExternalStore(
     subscribe,
-    () => window.location.search
+    () => locationSearchRef.current
   );
 
   React.useEffect(() => {
@@ -31,13 +44,6 @@ const useSearchParams = (parseOptions, stringifyOptions) => {
   }, [locationSearch, parseOptions]);
 
   return [searchParams, setSearchParams];
-};
-
-// Allows for proper navigation of history
-// https://www.codeguage.com/courses/js/events-popstate-event
-const subscribe = (callback) => {
-  window.addEventListener("popstate", callback);
-  return () => window.removeEventListener("popstate", callback);
 };
 
 export default useSearchParams;
