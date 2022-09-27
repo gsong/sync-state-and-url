@@ -3,7 +3,22 @@ import * as React from "react";
 import queryString from "query-string";
 
 const useSearchParams = ({ parseOptions, stringifyOptions } = {}) => {
-  const [searchParams, _setSearchParams] = React.useState({});
+  // TODO: useReducer in order to get the current `parseOptions` value,
+  // once we have useEvent, this can be a useState with useEvent most likely
+  const reducer = (_, action) => {
+    switch (action.type) {
+      case "parseAndUpdate": {
+        return queryString.parse(action.value, parseOptions);
+      }
+      case "update": {
+        return action.value;
+      }
+      default: {
+        throw new Error("Unrecognized action");
+      }
+    }
+  };
+  const [searchParams, dispatch] = React.useReducer(reducer, {});
   const locationSearchRef = React.useRef(window.location.search);
 
   const setSearchParams = React.useCallback(
@@ -19,7 +34,7 @@ const useSearchParams = ({ parseOptions, stringifyOptions } = {}) => {
         ? window.history.replaceState(...historyParams)
         : window.history.pushState(...historyParams);
 
-      _setSearchParams(params);
+      dispatch({ type: "update", value: params });
     },
     [stringifyOptions]
   );
@@ -42,9 +57,8 @@ const useSearchParams = ({ parseOptions, stringifyOptions } = {}) => {
   );
 
   React.useEffect(() => {
-    // TODO: useEvent here as well probably
-    _setSearchParams(queryString.parse(locationSearch, parseOptions));
-  }, [locationSearch, parseOptions]);
+    dispatch({ type: "parseAndUpdate", value: locationSearch });
+  }, [locationSearch]);
 
   return [searchParams, setSearchParams];
 };
