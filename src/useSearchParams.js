@@ -2,7 +2,7 @@ import * as React from "react";
 
 import queryString from "query-string";
 
-const useSearchParams = (parseOptions, stringifyOptions) => {
+const useSearchParams = ({ parseOptions, stringifyOptions } = {}) => {
   const [searchParams, _setSearchParams] = React.useState({});
   const locationSearchRef = React.useRef(window.location.search);
 
