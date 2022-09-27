@@ -8,6 +8,8 @@ const useSearchParams = (parseOptions, stringifyOptions) => {
 
   const setSearchParams = React.useCallback(
     (params, { replaceState } = { replaceState: false }) => {
+      // TODO: Once useEvent is real, this whole block should probably be an
+      // event so we're not relying on `stringifyOptions` not changing.
       const url = `${new URL(
         window.location.origin + window.location.pathname
       )}?${queryString.stringify(params, stringifyOptions)}`;
@@ -40,6 +42,7 @@ const useSearchParams = (parseOptions, stringifyOptions) => {
   );
 
   React.useEffect(() => {
+    // TODO: useEvent here as well probably
     _setSearchParams(queryString.parse(locationSearch, parseOptions));
   }, [locationSearch, parseOptions]);
 
